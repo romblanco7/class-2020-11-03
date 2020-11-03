@@ -49,6 +49,26 @@ week_9 <- kenya %>%
 * Fit a `stan_glm()` model which relates poverty to distance. Print a summary. (Hint: In order to see the coefficient of `distance`, you will probably need to use the `digits` argument to `print()`.) Interpret the meaning of the two important parameters.  
 
 
+```{r}
+week_9 %>%
+  select(poverty, distance) %>%
+  ggplot(aes(x = distance, y = poverty)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point()
+
+# There is a strong positive relationship between distance and poverty. Poverty increases as distance increases. 
+# Beyond the 90 km, the model becomes inaccurate as indicated by the widening confidence interval and the accumulation plotted geom_points around smaller  poverty and distance values. 
+# Different by ~10%
+
+fit_obj <- stan_glm(data = week_9,
+                    family = gaussian(),
+                    formula = poverty ~ distance,
+                    refresh = 0)
+print(fit_obj, digits = 5)
+
+# The median of.38641 is the median of the averages of all our posterior distribution observations. 
+# distance median determines the slope of the regression line. The higher the value the steeper the slope.
+```
 
 
 
@@ -60,7 +80,20 @@ week_9 <- kenya %>%
 
 * Estimate the model. Assign the fitted model to `fit_2`. Interpret the important parameters of the model.
 
+```{r}
+fit_2 <- stan_glm(data = week_9,
+         formula = reg_chg ~ treatment + poverty + distance + pop_density,
+         family = gaussian(),
+         refresh = 0)
+print(fit_2, digits = 5)
 
+# The median of.38641 is the median of the averages of all our posterior distribution observations. 
+
+# This model gives the change in voting registration change holding treatment, poverty, distance and population density as factors that influence the outcome. 
+
+```
+
+$$ reg~chg = \beta_0 + \beta_1 x_{t,i} + \beta_2 x_{d,i} + \beta_3 x_{p,i} + \beta_4 x_{pd,i} + \epsilon_i$$
 
 ## Scene 3
 
@@ -70,6 +103,11 @@ week_9 <- kenya %>%
 
 * Create a graphic of the posterior probability distribution of the causal effect of `local` treatment in polling stations which have +2 sigma poverty rates. Note that there are two ways to do this. First, we can use a parameter approach. This is what we did in class last week. Second, we can use `posterior_epred()`, which if generally easier since it does the math for us. Confirm that the two approaches give the same answer.
 
+```{r}
+week_9 %>%
+mutate(poverty_n = (poverty - mean(poverty)/ sd(poverty))) %>%
+  
+```
 
 
 
